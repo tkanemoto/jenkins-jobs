@@ -1,0 +1,15 @@
+- project:
+    name: tv
+    trigger: H * * * *
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - 'sync-{name}-{source-host}':
+          source-host: melchior
+          source-dir: /Volumes/phat/media/TV/
+          target-host: 'root@192.168.11.3'
+          target-dir: /mnt/DroboFS/Shares/share/media/TV/
+          options: -Pua
+      - 'organize-episodes-{host}-{name}':
+          host: melchior
+          library-dir: /Volumes/phat/media
+          search-dir: /Volumes/phat/media/Miro
