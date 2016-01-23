@@ -13,9 +13,6 @@
       - string:
           name: TARGET_DIR
           default: '{target-dir}'
-      - string:
-          name: OPTIONS
-          default: '{options}'
 
     triggers:
       - timed: '{trigger}'
@@ -23,9 +20,16 @@
     builders:
       - shell: |
           #!/bin/bash -ex
-          rsync \
-            --exclude .DS_Store \
-            {options} {source-dir} {target-host}:{target-dir}
+          for dir in $SOURCE_DIR ; do
+            rsync \
+              $dir {target-host}:$TARGET_DIR \
+              --exclude .DS_Store \
+              --exclude *-V100 \
+              --exclude .TemporaryItems \
+              --exclude .fseventsd \
+              --exclude *.crdownload \
+              {options}
+          done
 
     publishers:
       - email:
@@ -45,8 +49,14 @@
     builders:
       - shell: |
           #!/bin/bash -ex
-          rm -rf python-mlib
-          git clone https://github.com/tkanemoto/python-mlib
+          (
+            cd python-mlib
+            git fetch
+            git reset --hard origin/master
+          ) || {{
+            rm -rf python-mlib
+            git clone https://github.com/tkanemoto/python-mlib
+          }}
       - shell: |
           #!/bin/bash -ex
           python-mlib/mlib.py organise_movies --movies TV --move -v3 {library-dir} {search-dir}

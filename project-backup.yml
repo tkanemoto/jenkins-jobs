@@ -1,15 +1,51 @@
 - project:
-    name: tv
-    trigger: H * * * *
+    name: miro
+    trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
-      - 'sync-{name}-{source-host}':
-          source-host: melchior
-          source-dir: /Volumes/phat/media/TV/
-          target-host: 'root@192.168.11.3'
-          target-dir: /mnt/DroboFS/Shares/share/media/TV/
-          options: -Pua
       - 'organize-episodes-{host}-{name}':
           host: melchior
           library-dir: /Volumes/phat/media
           search-dir: /Volumes/phat/media/Miro
+
+- project:
+    name: home
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target-host: 'root@192.168.11.3'
+    target-dir: /mnt/DroboFS/Shares/share/
+    jobs:
+      - 'sync-{name}-{source-host}':
+          source-host: arwen
+          source-dir: /Users/tak/
+          options: >
+            -Phuav --stats
+            --exclude Downloads/
+            --exclude Library/
+            --exclude .jenkins/cache/
+            --exclude .cache/
+      - 'sync-{name}-{source-host}':
+          source-host: melchior
+          source-dir: /Volumes/phat/ /Volumes/phat/home/tak/
+          options: >
+            -Phuav --stats
+            --exclude Downloads/
+            --exclude Library/
+            --exclude .jenkins/cache/
+            --exclude home/
+            --exclude .cache/
+
+- project:
+    name: downloads
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target-host: 'root@192.168.11.3'
+    target-dir: /mnt/DroboFS/Shares/share/Downloads/
+    options: -Phuav --stats --remove-source-files
+    jobs:
+      - 'sync-{name}-{source-host}':
+          source-host: arwen
+          source-dir: /Users/tak/Downloads/
+      - 'sync-{name}-{source-host}':
+          source-host: melchior
+          source-dir: /Volumes/phat/home/tak/Downloads/
