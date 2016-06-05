@@ -5,8 +5,25 @@
     jobs:
       - 'organize-episodes-{host}-{name}':
           host: melchior
-          library-dir: /Volumes/phat/media
+          library-dir: /Volumes/share/media
           search-dir: /Volumes/phat/media/Miro
+          args: ''
+      - 'organize-episodes-{host}-{name}':
+          host: arwen
+          library-dir: /Volumes/share/media
+          search-dir: /Volumes/PHAT/Miro
+          args: ''
+
+- project:
+    name: tv
+    trigger: ''
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - 'organize-episodes-{host}-{name}':
+          host: arwen
+          library-dir: /Volumes/share/media
+          search-dir: /Volumes/share/media/TV
+          args: --move
 
 - project:
     name: home
@@ -19,21 +36,23 @@
           source-host: arwen
           source-dir: /Users/tak/
           options: >
-            -Phuav --stats
+            -PhuvrlptD --stats
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude .cache/
+            --exclude Movies/Miro/
       - 'sync-{name}-{source-host}':
           source-host: melchior
           source-dir: /Volumes/phat/ /Volumes/phat/home/tak/
           options: >
-            -Phuav --stats
+            -PhuvrlptD --stats
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude home/
             --exclude .cache/
+            --exclude media/Miro
 
 - project:
     name: downloads
@@ -41,7 +60,7 @@
     recipients: tak.kanemoto@gmail.com
     target-host: 'root@192.168.11.3'
     target-dir: /mnt/DroboFS/Shares/share/Downloads/
-    options: -Phuav --stats --remove-source-files
+    options: -PhuvrlptD --stats --remove-source-files
     jobs:
       - 'sync-{name}-{source-host}':
           source-host: arwen

@@ -59,7 +59,7 @@
           }}
       - shell: |
           #!/bin/bash -ex
-          python-mlib/mlib.py organise_movies --movies TV --move -v3 {library-dir} {search-dir}
+          python-mlib/mlib.py organise_movies --movies TV {args} -v3 {library-dir} {search-dir}
 
     publishers:
       - email:
