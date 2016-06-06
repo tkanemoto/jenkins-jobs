@@ -8,11 +8,11 @@
 
     parameters:
       - string:
-          name: SOURCE_DIR
-          default: '{source-dir}'
+          name: SOURCE
+          default: '{source-dirs}'
       - string:
-          name: TARGET_DIR
-          default: '{target-dir}'
+          name: TARGET
+          default: '{target}'
 
     triggers:
       - timed: '{trigger}'
@@ -20,9 +20,9 @@
     builders:
       - shell: |
           #!/bin/bash -ex
-          for dir in $SOURCE_DIR ; do
+          for dir in $SOURCE ; do
             rsync \
-              $dir {target-host}:$TARGET_DIR \
+              $dir $TARGET \
               --exclude .DS_Store \
               --exclude *-V100 \
               --exclude .TemporaryItems \

@@ -11,7 +11,7 @@
       - 'organize-episodes-{host}-{name}':
           host: arwen
           library-dir: /Volumes/share/media
-          search-dir: /Volumes/PHAT/Miro
+          search-dir: /Users/tak/Movies/Miro
           args: ''
 
 - project:
@@ -29,22 +29,23 @@
     name: home
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
-    target-host: 'root@192.168.11.3'
-    target-dir: /mnt/DroboFS/Shares/share/
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
       - 'sync-{name}-{source-host}':
           source-host: arwen
-          source-dir: /Users/tak/
+          source-dirs: /Users/tak/
           options: >
             -PhuvrlptD --stats
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude .cache/
+            --exclude .Trash/
             --exclude Movies/Miro/
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
       - 'sync-{name}-{source-host}':
           source-host: melchior
-          source-dir: /Volumes/phat/ /Volumes/phat/home/tak/
+          source-dirs: /Volumes/phat/ /Volumes/phat/home/tak/
           options: >
             -PhuvrlptD --stats
             --exclude Downloads/
@@ -52,19 +53,25 @@
             --exclude .jenkins/cache/
             --exclude home/
             --exclude .cache/
+            --exclude .Trash/
             --exclude media/Miro
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
 - project:
     name: downloads
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
-    target-host: 'root@192.168.11.3'
-    target-dir: /mnt/DroboFS/Shares/share/Downloads/
-    options: -PhuvrlptD --stats --remove-source-files
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
+    options: >
+      -PhuvrlptD
+      --stats
+      --exclude .Trash/
+      --remove-source-files
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
       - 'sync-{name}-{source-host}':
           source-host: arwen
-          source-dir: /Users/tak/Downloads/
+          source-dirs: /Users/tak/Downloads/
       - 'sync-{name}-{source-host}':
           source-host: melchior
-          source-dir: /Volumes/phat/home/tak/Downloads/
+          source-dirs: /Volumes/phat/home/tak/Downloads/
