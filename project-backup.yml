@@ -20,10 +20,28 @@
     recipients: tak.kanemoto@gmail.com
     jobs:
       - 'organize-episodes-{host}-{name}':
-          host: arwen
+          host: melchior
           library-dir: /Volumes/share/media
           search-dir: /Volumes/share/media/TV
           args: --move
+
+- project:
+    name: media
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
+    jobs:
+      - 'sync-{name}-{source-host}':
+          source-host: arwen
+          source-dirs: /Volumes/PHAT-2/ /Users/tak/media/
+          options: >
+            -PhuvrlptD --stats
+            --exclude Downloads/
+            --exclude Library/
+            --exclude .jenkins/cache/
+            --exclude .cache/
+            --exclude .Trash/
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
 - project:
     name: home
@@ -42,6 +60,7 @@
             --exclude .cache/
             --exclude .Trash/
             --exclude Movies/Miro/
+            --exclude media/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
       - 'sync-{name}-{source-host}':
           source-host: melchior
