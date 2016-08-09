@@ -7,23 +7,23 @@
           host: melchior
           library-dir: /Volumes/share/media
           search-dir: /Volumes/phat/media/Miro
-          args: ''
+          args: --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 192.168.11.201
       - 'organize-episodes-{host}-{name}':
           host: arwen
           library-dir: /Volumes/share/media
           search-dir: /Users/tak/Movies/Miro
-          args: ''
+          args: --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 192.168.11.201
 
 - project:
     name: tv
-    trigger: ''
+    trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
       - 'organize-episodes-{host}-{name}':
-          host: melchior
-          library-dir: /Volumes/share/media
-          search-dir: /Volumes/share/media/TV
-          args: --move
+          host: master
+          library-dir: /mnt/share/media
+          search-dir: /mnt/share/media/TV
+          args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
 
 - project:
     name: media
@@ -31,7 +31,7 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
     jobs:
-      - 'sync-{name}-{source-host}':
+      - sync:
           source-host: arwen
           source-dirs: /Volumes/PHAT-2/ /Users/tak/media/
           options: >
@@ -49,7 +49,7 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
-      - 'sync-{name}-{source-host}':
+      - sync:
           source-host: arwen
           source-dirs: /Users/tak/
           options: >
@@ -62,7 +62,7 @@
             --exclude Movies/Miro/
             --exclude media/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
-      - 'sync-{name}-{source-host}':
+      - sync:
           source-host: melchior
           source-dirs: /Volumes/phat/ /Volumes/phat/home/tak/
           options: >
@@ -88,9 +88,57 @@
       --remove-source-files
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
-      - 'sync-{name}-{source-host}':
+      - sync:
           source-host: arwen
           source-dirs: /Users/tak/Downloads/
-      - 'sync-{name}-{source-host}':
+      - sync:
           source-host: melchior
           source-dirs: /Volumes/phat/home/tak/Downloads/
+
+- project:
+    name: git
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/git'
+    options: >
+      -PhuvrlptD
+      --stats
+      --exclude .Trash/
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+    jobs:
+      - sync:
+          rsync: sudo rsync
+          source-host: master
+          source-dirs: /var/gerrit/git/
+
+- project:
+    name: srv
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
+    options: >
+      -PhuvrlptD
+      --stats
+      --exclude .Trash/
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+    jobs:
+      - sync:
+          rsync: sudo rsync
+          source-host: master
+          source-dirs: /srv/
+
+- project:
+    name: www
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
+    options: >
+      -PhuvrlptD
+      --stats
+      --exclude .Trash/
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+    jobs:
+      - sync:
+          rsync: sudo rsync
+          source-host: master
+          source-dirs: /var/www/
