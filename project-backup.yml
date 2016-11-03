@@ -33,7 +33,7 @@
     jobs:
       - sync:
           source-host: arwen
-          source-dirs: /Volumes/PHAT-2/ /Users/tak/media/
+          source-dirs: /Volumes/PHAT/
           options: >
             -PhuvrlptD --stats
             --exclude Downloads/
@@ -49,6 +49,19 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
+      - sync:
+          source-host: eowyn
+          source-dirs: /Users/tak/
+          options: >
+            -PhuvrlptD --stats
+            --exclude Downloads/
+            --exclude Library/
+            --exclude .jenkins/cache/
+            --exclude .cache/
+            --exclude .Trash/
+            --exclude Movies/Miro/
+            --exclude media/
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
       - sync:
           source-host: arwen
           source-dirs: /Users/tak/
