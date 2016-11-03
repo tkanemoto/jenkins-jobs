@@ -58,6 +58,8 @@
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude .cache/
+            --exclude .bash_sessions/
+            --exclude .dropbox/
             --exclude .Trash/
             --exclude Movies/Miro/
             --exclude media/
@@ -71,6 +73,8 @@
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude .cache/
+            --exclude .bash_sessions/
+            --exclude .dropbox/
             --exclude .Trash/
             --exclude Movies/Miro/
             --exclude media/
