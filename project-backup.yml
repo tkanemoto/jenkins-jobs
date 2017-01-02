@@ -32,7 +32,7 @@
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
     jobs:
       - sync:
-          source-host: arwen
+          source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
             -PhuvrlptD --stats
@@ -64,21 +64,7 @@
             --exclude Movies/Miro/
             --exclude media/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
-      - sync:
-          source-host: arwen
-          source-dirs: /Users/tak/
-          options: >
-            -PhuvrlptD --stats
-            --exclude Downloads/
-            --exclude Library/
-            --exclude .jenkins/cache/
-            --exclude .cache/
-            --exclude .bash_sessions/
-            --exclude .dropbox/
-            --exclude .Trash/
-            --exclude Movies/Miro/
-            --exclude media/
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+
       - sync:
           source-host: melchior
           source-dirs: /Volumes/phat/ /Volumes/phat/home/tak/
@@ -106,7 +92,7 @@
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
       - sync:
-          source-host: arwen
+          source-host: eowyn
           source-dirs: /Users/tak/Downloads/
       - sync:
           source-host: melchior
