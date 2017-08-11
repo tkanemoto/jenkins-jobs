@@ -1,0 +1,37 @@
+#
+# Website maintenance jobs
+#
+- defaults:
+    name: web-defaults
+    logrotate:
+      numToKeep: 100
+
+- job-template:
+    name: 'web-maintenance-{name}'
+    display-name: 'Web Maintenance - {name}'
+    node: '{name}'
+    defaults: web-defaults
+
+    triggers:
+      - timed: '{trigger}'
+
+    builders:
+      - shell: |
+          #!/bin/bash -ex
+          cd /var/www/django-site/site
+          mkdir -p portfolios/static/
+          source ../.virtualenv/bin/activate
+          echo '
+          from portfolios.models import *
+          print(str(" ".join(Page.objects.all().values_list("slug", flat=True))))
+          ' | ./manage.py shell --settings project.settings_local > $WORKSPACE/pages
+          for page in `cat $WORKSPACE/pages` ; do
+            sudo mkdir -p portfolios/static/$page
+            curl https://tkanemoto.com/portfolios/$page/ > $WORKSPACE/$page.html
+            sudo cp $WORKSPACE/$page.html portfolios/static/$page/index.html
+          done
+          ./manage.py collectstatic --noinput --settings project.settings_local
+
+    publishers:
+      - email:
+          recipients: '{recipients}'

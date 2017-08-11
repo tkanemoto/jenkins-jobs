@@ -1,4 +1,11 @@
 - project:
+    name: master
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - 'web-maintenance-{name}'
+
+- project:
     name: miro
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
@@ -129,6 +136,22 @@
           rsync: sudo rsync
           source-host: master
           source-dirs: /srv/
+
+- project:
+    name: jenkins
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
+    options: >
+      -PhuvrlptD
+      --stats
+      --exclude .Trash/
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+    jobs:
+      - sync:
+          rsync: sudo rsync
+          source-host: master
+          source-dirs: /var/lib/jenkins/
 
 - project:
     name: www

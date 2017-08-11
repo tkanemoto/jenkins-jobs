@@ -4,6 +4,8 @@
 - defaults:
     name: sync-defaults
     rsync: rsync
+    logrotate:
+      numToKeep: 100
 
 - job-group:
     name: sync
@@ -15,6 +17,7 @@
     name: 'sync-{name}-{source-host}'
     display-name: 'Sync {name} : {source-host}'
     node: '{source-host}'
+    defaults: sync-defaults
 
     parameters:
       - string:
@@ -55,6 +58,7 @@
     name: 'organize-episodes-{host}-{name}'
     display-name: 'Organize Episodes : {host} {name}'
     node: '{host}'
+    defaults: sync-defaults
 
     triggers:
       - timed: '{trigger}'
