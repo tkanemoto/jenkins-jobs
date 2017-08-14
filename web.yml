@@ -31,7 +31,13 @@
             sudo cp $WORKSPACE/$page.html portfolios/static/$page/index.html
           done
           ./manage.py collectstatic --noinput --settings project.settings_local
+          ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
 
     publishers:
       - email:
           recipients: '{recipients}'
+
+      - archive:
+          artifacts: '*'
+          allow-empty: 'true'
+          fingerprint: true
