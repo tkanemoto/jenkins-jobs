@@ -11,11 +11,6 @@
     recipients: tak.kanemoto@gmail.com
     jobs:
       - 'organize-episodes-{host}-{name}':
-          host: melchior
-          library-dir: /Volumes/share/media
-          search-dir: /Volumes/phat/media/Miro
-          args: --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 192.168.11.201
-      - 'organize-episodes-{host}-{name}':
           host: arwen
           library-dir: /Volumes/share/media
           search-dir: /Users/tak/Movies/Miro
@@ -48,6 +43,7 @@
             --exclude .jenkins/cache/
             --exclude .cache/
             --exclude .Trash/
+            --exclude repo-mirror/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
 - project:
@@ -72,20 +68,6 @@
             --exclude media/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
-      - sync:
-          source-host: melchior
-          source-dirs: /Volumes/phat/ /Volumes/phat/home/tak/
-          options: >
-            -PhuvrlptD --stats
-            --exclude Downloads/
-            --exclude Library/
-            --exclude .jenkins/cache/
-            --exclude home/
-            --exclude .cache/
-            --exclude .Trash/
-            --exclude media/Miro
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
-
 - project:
     name: downloads
     trigger: H H * * *
@@ -101,9 +83,6 @@
       - sync:
           source-host: eowyn
           source-dirs: /Users/tak/Downloads/
-      - sync:
-          source-host: melchior
-          source-dirs: /Volumes/phat/home/tak/Downloads/
 
 - project:
     name: git
