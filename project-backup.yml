@@ -43,6 +43,7 @@
             --exclude .jenkins/cache/
             --exclude .cache/
             --exclude .Trash/
+            --exclude .Trashes/
             --exclude repo-mirror/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
@@ -64,6 +65,7 @@
             --exclude .bash_sessions/
             --exclude .dropbox/
             --exclude .Trash/
+            --exclude .Trashes/
             --exclude Movies/Miro/
             --exclude media/
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
@@ -77,6 +79,7 @@
       -PhuvrlptD
       --stats
       --exclude .Trash/
+      --exclude .Trashes/
       --remove-source-files
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
@@ -93,6 +96,7 @@
       -PhuvrlptD
       --stats
       --exclude .Trash/
+      --exclude .Trashes/
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
       - sync:

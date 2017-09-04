@@ -28,8 +28,20 @@
           for page in `cat $WORKSPACE/pages` ; do
             sudo mkdir -p portfolios/static/$page
             curl https://tkanemoto.com/portfolios/$page/ > $WORKSPACE/$page.html
-            sudo cp $WORKSPACE/$page.html portfolios/static/$page/index.html
+            #sudo cp $WORKSPACE/$page.html portfolios/static/$page/index.html
+            sudo cp $WORKSPACE/$page.html portfolios/static/index.html
+
+            echo "
+          from settings_local import *
+          AWS_STORAGE_BUCKET_NAME = 'www.$page.com'
+          AWS_AUTO_CREATE_BUCKET = True
+          " | sudo dd of=project/temp.py
+
+            ./manage.py collectstatic --noinput --settings project.temp
           done
+          sudo rm $WORKSPACE/$page.html portfolios/static/index.html
+          sudo rm project/temp.py
+
           ./manage.py collectstatic --noinput --settings project.settings_local
           ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
 
