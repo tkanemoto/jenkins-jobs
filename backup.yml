@@ -80,7 +80,7 @@
           source .env/bin/activate
           pip install -r python-mlib/requirements.txt
           cd {library-dir}
-          python-mlib/mlib.py organise_movies -v3 --traceback \
+          $WORKSPACE/python-mlib/mlib.py organise_movies -v3 --traceback \
             {args} {search-dir}
 
     publishers:
