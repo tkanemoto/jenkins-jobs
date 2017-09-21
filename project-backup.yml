@@ -24,7 +24,7 @@
       - 'organize-episodes-{host}-{name}':
           host: master
           library-dir: /mnt/share/media
-          search-dir: /mnt/share/media/TV
+          search-dir: /mnt/share/media/Transmission
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
 
 - project:
