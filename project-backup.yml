@@ -45,6 +45,7 @@
             --exclude .Trash/
             --exclude .Trashes/
             --exclude repo-mirror/
+            --exclude TV
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
 
 - project:

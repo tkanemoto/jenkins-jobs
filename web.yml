@@ -19,27 +19,28 @@
       - shell: |
           #!/bin/bash -ex
           cd /var/www/django-site/site
-          mkdir -p portfolios/static/
           source ../.virtualenv/bin/activate
           echo '
           from portfolios.models import *
-          print(str(" ".join(Page.objects.all().values_list("slug", flat=True))))
-          ' | ./manage.py shell --settings project.settings_local > $WORKSPACE/pages
-          for page in `cat $WORKSPACE/pages` ; do
-            sudo mkdir -p portfolios/static/$page
-            curl https://tkanemoto.com/portfolios/$page/ > $WORKSPACE/$page.html
-            #sudo cp $WORKSPACE/$page.html portfolios/static/$page/index.html
-            sudo cp $WORKSPACE/$page.html portfolios/static/index.html
+          for p in Page.objects.all(): print(p.slug + " " + p.domain)
+
+          ' | ./manage.py shell --settings project.settings_local | while read line ; do
+            slug=`echo $line | cut -d ' ' -f1`
+            domain=`echo $line | cut -d ' ' -f2`
+            curl https://tkanemoto.com/portfolios/$slug/ > $WORKSPACE/$slug.html
+            sudo cp $WORKSPACE/$slug.html static/index.html
 
             echo "
           from settings_local import *
-          AWS_STORAGE_BUCKET_NAME = 'www.$page.com'
+          AWS_STORAGE_BUCKET_NAME = '$domain'
           AWS_AUTO_CREATE_BUCKET = True
+          AWS_S3_OBJECT_PARAMETERS['CacheControl'] = 'max-age=86400'
+          AWS_QUERYSTRING_EXPIRE = 86400
           " | sudo dd of=project/temp.py
 
             ./manage.py collectstatic --noinput --settings project.temp
           done
-          sudo rm $WORKSPACE/$page.html portfolios/static/index.html
+          sudo rm static/index.html
           sudo rm project/temp.py
 
           ./manage.py collectstatic --noinput --settings project.settings_local
