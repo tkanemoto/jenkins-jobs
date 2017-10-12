@@ -6,17 +6,6 @@
       - 'web-maintenance-{name}'
 
 - project:
-    name: miro
-    trigger: H H * * *
-    recipients: tak.kanemoto@gmail.com
-    jobs:
-      - 'organize-episodes-{host}-{name}':
-          host: arwen
-          library-dir: /Volumes/share/media
-          search-dir: /Users/tak/Movies/Miro
-          args: --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 192.168.11.201
-
-- project:
     name: tv
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
@@ -94,23 +83,6 @@
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
 
 - project:
-    name: git
-    trigger: H H * * *
-    recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/git'
-    options: >
-      -PhuvrlptD
-      --stats
-      --exclude .Trash/
-      --exclude .Trashes/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
-    jobs:
-      - sync:
-          rsync: sudo rsync
-          source-host: master
-          source-dirs: /var/gerrit/git/
-
-- project:
     name: srv
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
@@ -135,6 +107,8 @@
       -PhuvrlptD
       --stats
       --exclude .Trash/
+      --exclude jobs/*/builds/
+      --exclude .cache/
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
     jobs:
       - sync:
