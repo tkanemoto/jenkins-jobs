@@ -45,6 +45,7 @@
           target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
+          rsync: sudo rsync
           options: >
             -PhuvrlptD --stats
             --exclude *.part
