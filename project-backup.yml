@@ -41,6 +41,17 @@
             --exclude repo-mirror/
             --exclude TV
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+      - sync:
+          target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
+          source-host: master
+          source-dirs: /var/lib/transmission-daemon/downloads/
+          options: >
+            -PhuvrlptD --stats
+            --exclude *.part
+            --exclude ._*
+            --remove-source-files
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+
 - project:
     name: movies
     trigger: H H * * *
