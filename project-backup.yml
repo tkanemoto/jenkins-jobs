@@ -7,7 +7,7 @@
 
 - project:
     name: tv
-    trigger: H H * * *
+    trigger: H/10 * * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
       - 'organize-episodes-{host}-{name}':
@@ -15,14 +15,19 @@
           library-dir: /mnt/share/media
           search-dir: /mnt/share/media/Transmission
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
+      - sync:
+          target: /media/sf_drive/Backup/Share/media/TV/
+          source-host: master
+          source-dirs: /mnt/share/media/TV/
+          options: -PhurltvpD --stats --exclude *.part
 
 - project:
     name: media
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
     jobs:
       - sync:
+          target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
           source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
@@ -36,6 +41,27 @@
             --exclude repo-mirror/
             --exclude TV
             --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+- project:
+    name: movies
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - sync:
+          target: /media/sf_drive/Backup/Share/media/Movies/
+          source-host: master
+          source-dirs: /mnt/share/media/Movies/
+          options: -PhurltvpD --stats --exclude *.part
+
+- project:
+    name: music
+    trigger: H H * * *
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - sync:
+          target: /media/sf_drive/Backup/Share/media/Music/
+          source-host: master
+          source-dirs: /mnt/share/media/Music/
+          options: -PhurltvpD --stats --exclude desktop.ini  --exclude *.part
 
 - project:
     name: home

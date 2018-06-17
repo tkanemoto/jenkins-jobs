@@ -37,6 +37,9 @@
       - shell: |
           #!/bin/bash -ex
           for dir in $SOURCE ; do
+            if [ -n "$GDRIVE_ID" ] ; then
+              /usr/local/bin/gdrive sync upload $dir $GDRIVE_ID
+            fi
             $RSYNC_COMMAND \
               $dir $TARGET \
               --exclude .DS_Store \
@@ -44,6 +47,7 @@
               --exclude .TemporaryItems \
               --exclude .fseventsd \
               --exclude *.crdownload \
+              --exclude ._* \
               {options}
           done
 
