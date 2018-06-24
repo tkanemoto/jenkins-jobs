@@ -73,7 +73,12 @@
           target: /media/sf_drive/Backup/Share/media/Music/
           source-host: master
           source-dirs: /mnt/share/media/Music/
-          options: -PhurltvDmiS --stats --exclude desktop.ini  --exclude *.part
+          options: >
+            -PhurltvDmiS --stats
+            --exclude desktop.ini
+            --exclude Desktop.ini
+            --exclude .Desktop.ini.*
+            --exclude *.part
 
 - project:
     name: home
@@ -180,7 +185,7 @@
           source-host: master
           source-dirs: /mnt/share/proj/git/
           options: >
-            -PhurltvDmiS --stats
+            -PhurtvDmiS --stats
             --exclude tmp_*
             --exclude *.tmp
             --exclude incoming_*

@@ -48,6 +48,7 @@
               --exclude .fseventsd \
               --exclude *.crdownload \
               --exclude ._* \
+              --exclude .AppleDouble \
               {options}
           done
 
