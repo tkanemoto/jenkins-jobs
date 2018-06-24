@@ -52,6 +52,16 @@
           ./manage.py collectstatic --noinput --settings project.settings_local
           ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
 
+      - shell: |
+          (cd db-dumps && git pull -r) || {{
+            git clone /var/gerrit/git/web/db-dumps.git --reference /var/gerrit/git/web/db-dumps.git
+          }}
+          cd db-dumps
+          sudo -u postgres pg_dumpall > dump.sql
+          git add dump.sql
+          git commit -m "Dump at `date +'%F-%H%M'`" || true
+          git push origin master
+
     publishers:
       - email:
           recipients: '{recipients}'

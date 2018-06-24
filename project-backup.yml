@@ -19,11 +19,11 @@
           target: /media/sf_drive/Backup/Share/media/TV/
           source-host: master
           source-dirs: /mnt/share/media/TV/
-          options: -PhurltvpD --stats --exclude *.part
+          options: -PhurltvDmiS --stats --exclude *.part
 
 - project:
     name: media
-    trigger: H H * * *
+    trigger: H * * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
       - sync:
@@ -31,7 +31,7 @@
           source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
-            -PhuvrlptD --stats
+            -PhuvrltDmiS --stats
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
@@ -47,7 +47,7 @@
           source-dirs: /var/lib/transmission-daemon/downloads/
           rsync: sudo rsync
           options: >
-            -PhuvrlptD --stats
+            -PhuvrltDmiS --stats
             --exclude *.part
             --exclude ._*
             --remove-source-files
@@ -62,7 +62,7 @@
           target: /media/sf_drive/Backup/Share/media/Movies/
           source-host: master
           source-dirs: /mnt/share/media/Movies/
-          options: -PhurltvpD --stats --exclude *.part
+          options: -PhurltvDmiS --stats --exclude *.part
 
 - project:
     name: music
@@ -73,7 +73,7 @@
           target: /media/sf_drive/Backup/Share/media/Music/
           source-host: master
           source-dirs: /mnt/share/media/Music/
-          options: -PhurltvpD --stats --exclude desktop.ini  --exclude *.part
+          options: -PhurltvDmiS --stats --exclude desktop.ini  --exclude *.part
 
 - project:
     name: home
@@ -85,7 +85,7 @@
           source-host: eowyn
           source-dirs: /Users/tak/
           options: >
-            -PhuvrlptD --stats
+            -PhuvrltDmiS --stats
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
@@ -104,7 +104,7 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
     options: >
-      -PhuvrlptD
+      -PhuvrltDmiS
       --stats
       --exclude .Trash/
       --exclude .Trashes/
@@ -122,11 +122,11 @@
 
 - project:
     name: srv
-    trigger: H H * * *
+    trigger: H H * * 1
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
     options: >
-      -PhuvrlptD
+      -PhuvrlptDmiS
       --stats
       --exclude .Trash/
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
@@ -142,7 +142,7 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
     options: >
-      -PhuvrlptD
+      -PhuvrlptDmiS
       --stats
       --exclude .Trash/
       --exclude jobs/*/builds/
@@ -160,7 +160,7 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
     options: >
-      -PhuvrlptD
+      -PhuvrlptDmiS
       --stats
       --exclude .Trash/
       --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
@@ -169,3 +169,18 @@
           rsync: sudo rsync
           source-host: master
           source-dirs: /var/www/
+
+- project:
+    name: git
+    trigger: H H * * 2
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - sync:
+          target: /media/sf_drive/Backup/Share/proj/git/
+          source-host: master
+          source-dirs: /mnt/share/proj/git/
+          options: >
+            -PhurltvDmiS --stats
+            --exclude tmp_*
+            --exclude *.tmp
+            --exclude incoming_*
