@@ -1,6 +1,6 @@
 - project:
     name: master
-    trigger: H H * * *
+    trigger: H 3 * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
       - 'web-maintenance-{name}'

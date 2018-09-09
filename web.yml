@@ -42,6 +42,7 @@
           AWS_AUTO_CREATE_BUCKET = True
           AWS_S3_OBJECT_PARAMETERS['CacheControl'] = 'max-age=86400'
           AWS_QUERYSTRING_EXPIRE = 86400
+          AWS_DEFAULT_ACL = 'public-read'
           " | sudo dd of=project/temp.py
 
             ./manage.py collectstatic --noinput --settings project.temp
@@ -53,7 +54,10 @@
           ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
 
       - shell: |
-          (cd db-dumps && git pull -r) || {{
+          if [ `date +%H` -lt 1 ] || [ `date +%H` -gt 7 ]; then
+            exit
+          fi
+          (cd db-dumps && git reset --hard && git pull -r) || {{
             git clone /var/gerrit/git/web/db-dumps.git --reference /var/gerrit/git/web/db-dumps.git
           }}
           cd db-dumps
