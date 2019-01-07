@@ -15,11 +15,20 @@
           library-dir: /mnt/share/media
           search-dir: /mnt/share/media/Transmission
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\media\TV
+          target: G:\My Drive\Backup\Share\media\TV
+          options: /XF *.part
       - sync:
+          disabled: true
           target: /media/sf_drive/Backup/Share/media/TV/
           source-host: master
           source-dirs: /mnt/share/media/TV/
-          options: -PhurltvDmiS --stats --exclude *.part
+          options: >
+            -urltvDmiS
+            --exclude *.part
+            --remove-source-files \
 
 - project:
     name: media
@@ -31,7 +40,7 @@
           source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
-            -PhuvrltDmiS --stats
+            -urltDmiS
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
@@ -40,45 +49,80 @@
             --exclude .Trashes/
             --exclude repo-mirror/
             --exclude TV
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
       - sync:
           target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
           rsync: sudo rsync
           options: >
-            -PhuvrltDmiS --stats
+            -urltDmiS
             --exclude *.part
             --exclude ._*
             --remove-source-files
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
 
 - project:
     name: movies
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\media\Movies
+          target: G:\My Drive\Backup\Share\media\Movies
+          options: /XF *.part
       - sync:
+          disabled: true
           target: /media/sf_drive/Backup/Share/media/Movies/
           source-host: master
           source-dirs: /mnt/share/media/Movies/
-          options: -PhurltvDmiS --stats --exclude *.part
+          options: >
+            -hurltvDmiS --progress --stats --exclude *.part \
 
 - project:
     name: music
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
     jobs:
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\media\Music
+          target: G:\My Drive\Backup\Share\media\Music
+          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.*
       - sync:
+          disabled: true
           target: /media/sf_drive/Backup/Share/media/Music/
           source-host: master
           source-dirs: /mnt/share/media/Music/
           options: >
-            -PhurltvDmiS --stats
+            -urltDmiS
             --exclude desktop.ini
             --exclude Desktop.ini
             --exclude .Desktop.ini.*
-            --exclude *.part
+            --exclude *.part \
+
+- project:
+    name: virtualbox-vms
+    trigger: H H H * *
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\VirtualBox VMs
+          target: G:\My Drive\Backup\Share\VirtualBox VMs
+          options: /XF *.part
+      - sync:
+          disabled: true
+          target: /media/sf_drive/Backup/Share/VirtualBox VMs/
+          source-host: master
+          source-dirs: /mnt/share/VirtualBox VMs/
+          options: >
+            -urltDmiS
+            --exclude desktop.ini
+            --exclude Desktop.ini
+            --exclude .Desktop.ini.*
+            --exclude *.part \
 
 - project:
     name: home
@@ -90,7 +134,7 @@
           source-host: eowyn
           source-dirs: /Users/tak/
           options: >
-            -PhuvrltDmiS --stats
+            -urltDmiS
             --exclude Downloads/
             --exclude Library/
             --exclude .jenkins/cache/
@@ -101,7 +145,7 @@
             --exclude .Trashes/
             --exclude Movies/Miro/
             --exclude media/
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
 
 - project:
     name: downloads
@@ -109,12 +153,11 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
     options: >
-      -PhuvrltDmiS
-      --stats
+      -urltDmiS
       --exclude .Trash/
       --exclude .Trashes/
       --remove-source-files
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
           source-host: eowyn
@@ -131,10 +174,9 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
     options: >
-      -PhuvrlptDmiS
-      --stats
+      -urlptDmiS
       --exclude .Trash/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
           rsync: sudo rsync
@@ -147,12 +189,11 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
     options: >
-      -PhuvrlptDmiS
-      --stats
+      -urlptDmiS
       --exclude .Trash/
       --exclude jobs/*/builds/
       --exclude .cache/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
           rsync: sudo rsync
@@ -165,10 +206,9 @@
     recipients: tak.kanemoto@gmail.com
     target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
     options: >
-      -PhuvrlptDmiS
-      --stats
+      -urlptDmiS
       --exclude .Trash/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
           rsync: sudo rsync
@@ -180,12 +220,47 @@
     trigger: H H * * 2
     recipients: tak.kanemoto@gmail.com
     jobs:
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\proj\git
+          target: G:\My Drive\Backup\Share\proj\git
+          options: /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
       - sync:
+          disabled: true
           target: /media/sf_drive/Backup/Share/proj/git/
           source-host: master
           source-dirs: /mnt/share/proj/git/
           options: >
-            -PhurtvDmiS --stats
+            -urtDmiS
             --exclude tmp_*
             --exclude *.tmp
-            --exclude incoming_*
+            --exclude incoming_* \
+
+- project:
+    name: backups
+    trigger: H H * * 2
+    recipients: tak.kanemoto@gmail.com
+    jobs:
+      - sync-win:
+          source-host: gondor
+          source: \\192.168.11.3\share\Backup
+          target: G:\My Drive\Backup
+          options: /XD Downloads /XD .jenkins\cache /XD .cache /XD .bash_sessions /XD .dropbox /XD media
+      - sync:
+          disabled: true
+          target: /media/sf_drive/Backup/
+          source-host: master
+          source-dirs: /mnt/share/Backup/
+          options: >
+            -urltDmiS
+            --exclude Downloads/
+            --exclude Library/
+            --exclude .jenkins/cache/
+            --exclude .cache/
+            --exclude .bash_sessions/
+            --exclude .dropbox/
+            --exclude .Trash/
+            --exclude .Trashes/
+            --exclude Movies/Miro/
+            --exclude media/
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \

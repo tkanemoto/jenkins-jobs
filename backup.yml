@@ -7,28 +7,22 @@
     logrotate:
       numToKeep: 100
 
+#
+# Unix
+#
 - job-group:
     name: sync
     defaults: sync-defaults
+    all-options: -hv --progress --stats {options}
     jobs:
       - 'sync-{name}-{source-host}'
 
 - job-template:
     name: 'sync-{name}-{source-host}'
-    display-name: 'Sync {name} : {source-host}'
+    display-name: 'Sync {name} : {source-host}   ⟶   {target}'
     node: '{source-host}'
     defaults: sync-defaults
-
-    parameters:
-      - string:
-          name: SOURCE
-          default: '{source-dirs}'
-      - string:
-          name: TARGET
-          default: '{target}'
-      - string:
-          name: RSYNC_COMMAND
-          default: '{rsync}'
+    disabled: '{obj:disabled}'
 
     triggers:
       - timed: '{trigger}'
@@ -36,12 +30,16 @@
     builders:
       - shell: |
           #!/bin/bash -ex
-          for dir in $SOURCE ; do
+          if [ -e /usr/local/opt/coreutils/libexec/gnubin/stdbuf ] ; then
+            export PATH=/usr/local/opt/coreutils/libexec/gnubin/:$PATH
+          fi
+          IFS=","
+          for dir in "{source-dirs}" ; do
             if [ -n "$GDRIVE_ID" ] ; then
-              /usr/local/bin/gdrive sync upload $dir $GDRIVE_ID
+              /usr/local/bin/gdrive sync upload "$dir" $GDRIVE_ID
             fi
-            $RSYNC_COMMAND \
-              $dir $TARGET \
+            {rsync} \
+              "$dir" "{target}" \
               --exclude .DS_Store \
               --exclude *-V100 \
               --exclude .TemporaryItems \
@@ -49,9 +47,51 @@
               --exclude *.crdownload \
               --exclude ._* \
               --exclude .AppleDouble \
-              {options}
+              {all-options} \
+            | stdbuf -oL tr '\r' '\n'
           done
 
+    publishers:
+      - email:
+          recipients: '{recipients}'
+
+#
+# Windows
+#
+- job-group:
+    name: sync-win
+    defaults: sync-defaults
+    jobs:
+      - 'sync-drivefs-{name}-{source-host}'
+
+- job-template:
+    name: 'sync-drivefs-{name}-{source-host}'
+    display-name: 'Sync DriveFS {name} : {source-host}   ⟶   {target}'
+    node: '{source-host}'
+    defaults: sync-defaults
+
+    triggers:
+      - timed: '{trigger}'
+
+    builders:
+      - batch: |
+          robocopy /s /v "{source}" "{target}" ^
+            /COPY:DT /DCOPY:DT ^
+            {options} ^
+            /XD .AppleDouble ^
+            /XF .DS_Store ^
+            /XD .Trashes ^
+            /XD .Trash ^
+            /XD $RECYCLE.BIN ^
+            /XD *-V100 ^
+            /XD .TemporaryItems ^
+            /XD .fseventsd ^
+            /XF *.crdownload ^
+            /XF ._* ^
+            /XF desktop.ini
+          IF %ERRORLEVEL% EQU 0 EXIT 0
+          IF %ERRORLEVEL% EQU 1 EXIT 0
+          IF %ERRORLEVEL% EQU 2 EXIT 0
     publishers:
       - email:
           recipients: '{recipients}'
