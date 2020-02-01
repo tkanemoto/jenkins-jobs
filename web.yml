@@ -6,14 +6,99 @@
     logrotate:
       numToKeep: 100
 
+
+- job-group:
+    name: web
+    defaults: web-defaults
+    jobs:
+      - 'web-maintenance-{name}':
+          trigger: '{trigger-maintenance}'
+      - 'web-update-certs-{name}':
+          trigger: '{trigger-update-certs}'
+      - 'web-dns-update-cloudflare-{name}'
+
 - job-template:
-    name: 'web-maintenance-{name}'
-    display-name: 'Web Maintenance - {name}'
+    name: 'web-dns-update-cloudflare-{name}'
+    display-name: 'Web : DNS update (CloudFlare)'
+    node: '{name}'
+    defaults: web-defaults
+
+    scm:
+      - git:
+          url: https://github.com/tkanemoto/dns-scripts
+          branches:
+            - origin/master
+          skip-tag: true
+          browser: auto
+          browser-url: https://github.com/tkanemoto/dns-scripts
+          wipe-workspace: false
+
+    triggers:
+      - timed: 'H/10 * * * *'
+
+    parameters:
+      - string:
+          name: auth_email
+          default: '{auth-email}'
+      - string:
+          name: zone_name
+          default: '{zone-name}'
+      - string:
+          name: record_name
+          default: '{record-name}'
+
+    wrappers:
+      - inject-passwords:
+          global: true
+
+    builders:
+      - shell: |
+          #!/bin/bash -ex
+          bash update-cloudflare.sh
+
+    publishers:
+      - email:
+          recipients: '{recipients}'
+
+      - description-setter:
+          regexp: "^((IP has not changed|Updat).*)"
+
+
+- job-template:
+    name: 'web-update-certs-{name}'
+    display-name: 'Web : Update Certs - {name}'
     node: '{name}'
     defaults: web-defaults
 
     triggers:
       - timed: '{trigger}'
+
+    builders:
+      - shell: |
+          #!/bin/bash -ex
+          sudo certbot renew
+
+    publishers:
+      - email:
+          recipients: '{recipients}'
+
+      - description-setter:
+          regexp: "Congratulations, all renewals succeeded"
+
+
+- job-template:
+    name: 'web-maintenance-{name}'
+    display-name: 'Web : Maintenance - {name}'
+    node: '{name}'
+    defaults: web-defaults
+
+    triggers:
+      - timed: '{trigger}'
+
+    parameters:
+      - bool:
+          name: dump_db
+          default: false
 
     builders:
       - shell: |
@@ -53,18 +138,21 @@
           ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
 
       - shell: |
-          if [ `date +%H` -lt 1 ] || [ `date +%H` -gt 7 ]; then
+          if [ "$dump_db" = "true" ] ; then
+            echo "Forcing DB dump"
+          elif [ `date +%H` -lt 1 ] || [ `date +%H` -gt 9 ] ; then
             exit
           fi
           echo 1 | sudo dd of=/sys/kernel/mm/ksm/run
           (cd db-dumps && git reset --hard && git pull -r) || {{
-            git clone /var/gerrit/git/web/db-dumps.git --reference /var/gerrit/git/web/db-dumps.git
+            mkdir -p db-dumps
+            git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps checkout master
           }}
           cd db-dumps
           sudo -u postgres pg_dumpall > dump.sql
-          git add dump.sql
-          git commit -m "Dump at `date +'%F-%H%M'`" || true
-          git push origin master
+          git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps add dump.sql
+          git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps commit -m "Dump at `date +'%F-%H%M'`" || true
+          #git push origin master
 
     publishers:
       - email:

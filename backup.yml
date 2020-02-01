@@ -55,6 +55,10 @@
       - email:
           recipients: '{recipients}'
 
+      - description-setter:
+          regexp: 'sent .* bytes  .*'
+
+
 #
 # Windows
 #
@@ -62,11 +66,11 @@
     name: sync-win
     defaults: sync-defaults
     jobs:
-      - 'sync-drivefs-{name}-{source-host}'
+      - 'sync-drivefs-{name}-{folder}-{source-host}'
 
 - job-template:
-    name: 'sync-drivefs-{name}-{source-host}'
-    display-name: 'Sync DriveFS {name} : {source-host}   ⟶   {target}'
+    name: 'sync-drivefs-{name}-{folder}-{source-host}'
+    display-name: 'Sync DriveFS {name} » {folder} : {source-host}   ⟶   {target}'
     node: '{source-host}'
     defaults: sync-defaults
 
@@ -75,9 +79,10 @@
 
     builders:
       - batch: |
-          robocopy /s /v "{source}" "{target}" ^
+          robocopy /s "{source}{folder}" "{target}{folder}" ^
             /COPY:DT /DCOPY:DT ^
             {options} ^
+            /XO ^
             /XD .AppleDouble ^
             /XF .DS_Store ^
             /XD .Trashes ^
@@ -88,13 +93,22 @@
             /XD .fseventsd ^
             /XF *.crdownload ^
             /XF ._* ^
-            /XF desktop.ini
+            /XF desktop.ini ^
+            /XD "Application Data"
           IF %ERRORLEVEL% EQU 0 EXIT 0
           IF %ERRORLEVEL% EQU 1 EXIT 0
           IF %ERRORLEVEL% EQU 2 EXIT 0
+          IF %ERRORLEVEL% EQU 3 EXIT 0
+
     publishers:
       - email:
           recipients: '{recipients}'
+
+      - description-setter:
+          regexp: "Bytes : (.*)$"
+          description: '<pre>\1</pre>'
+          regexp-for-failed: "Bytes : (.*)$"
+          description-for-failed: '<pre>\1</pre>'
 
 #
 # Organize TV episodes
@@ -119,6 +133,7 @@
             rm -rf python-mlib
             git clone https://github.com/tkanemoto/python-mlib
           }}
+
       - shell: |
           #!/bin/bash -ex
           virtualenv .env
@@ -131,6 +146,32 @@
     publishers:
       - email:
           recipients: '{recipients}'
+
       - description-setter:
           regexp: "Transferred .* failed .* out of .*"
           regexp-for-failed: "Transferred .* failed .* out of .*"
+
+#
+# Do some clean up
+#
+- job-template:
+    name: 'cleanup-{host}-{name}'
+    display-name: 'Clean-up : {host} {name}'
+    node: '{host}'
+    default: sync-defaults
+
+    triggers:
+      - timed: '{trigger}'
+
+    builders:
+      - shell: |
+          #!/bin/bash -ex
+          find "{search-dir}" -type d -exec du -sb "{{}}" \; | while read line ; do
+            echo $line
+            bytes=`echo $line | awk '{{print $1}}'`
+            name=`echo $line | sed -r 's/^[0-9]+ //'`
+            if [ $bytes -lt 20000000 ] ; then
+              echo "Removing $name"
+              rm -rfv "$name"
+            fi
+          done
