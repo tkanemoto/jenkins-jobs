@@ -19,7 +19,7 @@
 
 - job-template:
     name: 'sync-{name}-{source-host}'
-    display-name: 'Sync {name} : {source-host}   ⟶   {target}'
+    display-name: 'Sync {name} : {source-host}   ⟶   {target-host} {target-dir}'
     node: '{source-host}'
     defaults: sync-defaults
     disabled: '{obj:disabled}'
@@ -33,13 +33,19 @@
           if [ -e /usr/local/opt/coreutils/libexec/gnubin/stdbuf ] ; then
             export PATH=/usr/local/opt/coreutils/libexec/gnubin/:$PATH
           fi
+          if [ -n "{target-host}" ] ; then
+            while ! ssh {target-host} ls {target-dir} ; do sleep 30 ; done
+            target="{target-host}:{target-dir}"
+          else
+            target="{target-dir}"
+          fi
           IFS=","
           for dir in "{source-dirs}" ; do
             if [ -n "$GDRIVE_ID" ] ; then
               /usr/local/bin/gdrive sync upload "$dir" $GDRIVE_ID
             fi
             {rsync} \
-              "$dir" "{target}" \
+              "$dir" "$target" \
               --exclude .DS_Store \
               --exclude *-V100 \
               --exclude .TemporaryItems \
@@ -47,6 +53,9 @@
               --exclude *.crdownload \
               --exclude ._* \
               --exclude .AppleDouble \
+              --exclude *.part \
+              --exclude .Trash \
+              --exclude .Trashes \
               {all-options} \
             | stdbuf -oL tr '\r' '\n'
           done
@@ -82,6 +91,7 @@
           robocopy /s "{source}{folder}" "{target}{folder}" ^
             /COPY:DT /DCOPY:DT ^
             {options} ^
+            /J ^
             /XO ^
             /XD .AppleDouble ^
             /XF .DS_Store ^
@@ -94,6 +104,8 @@
             /XF *.crdownload ^
             /XF ._* ^
             /XF desktop.ini ^
+            /XF incoming_* ^
+            /XF Icon* ^
             /XD "Application Data"
           IF %ERRORLEVEL% EQU 0 EXIT 0
           IF %ERRORLEVEL% EQU 1 EXIT 0

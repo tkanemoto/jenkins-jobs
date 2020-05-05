@@ -7,18 +7,18 @@
           trigger-update-certs: H H * * *
           auth-email: tak.kanemoto@gmail.com
           zone-name: tkanemoto.com
-          record-name: tkanemoto.com
+          record-name: apps.tkanemoto.com
 
 
 - project:
     name: tv
     trigger: H * * * *
     recipients: tak.kanemoto@gmail.com
-    search-dir: /mnt/share/media/Transmission
+    search-dir: /srv/share/media/Transmission
     jobs:
       - 'organize-episodes-{host}-{name}':
           host: master
-          library-dir: /mnt/share/media
+          library-dir: /srv/share/media
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
       - 'cleanup-{host}-{name}':
           host: master
@@ -30,7 +30,10 @@
     recipients: tak.kanemoto@gmail.com
     jobs:
       - sync:
-          target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
+          #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
+          #  --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
+          target-host: 'tak@192.168.11.201'
+          target-dir: '/srv/share/media/'
           source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
@@ -39,168 +42,193 @@
             --exclude Library/
             --exclude .jenkins/cache/
             --exclude .cache/
-            --exclude .Trash/
-            --exclude .Trashes/
             --exclude repo-mirror/
-            --exclude TV
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
+            --exclude TV \
 
       - sync:
-          target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
+          target-host: ''
+          target-dir: '/srv/share/media/'
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
           rsync: sudo rsync
           options: >
             -urltDmiS
-            --exclude *.part
-            --exclude ._*
-            --remove-source-files
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
+            --remove-source-files \
 
       - sync-win:
           folder: Movies
           source-host: gondor
-          source: \\192.168.11.3\share\media\
+          source: \\192.168.11.201\srv\share\media\
           target: G:\My Drive\Backup\Share\media\
           options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
       - sync-win:
           folder: Music
           source-host: gondor
-          source: \\192.168.11.3\share\media\
+          source: \\192.168.11.201\srv\share\media\
           target: G:\My Drive\Backup\Share\media\
           options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
       - sync-win:
           folder: Production
           source-host: gondor
-          source: \\192.168.11.3\share\media\
+          source: \\192.168.11.201\srv\share\media\
           target: G:\My Drive\
           options: /XF *.part /XF desktop.ini /XF .Desktop.ini.*
       - sync-win:
           folder: TV
           source-host: gondor
-          source: \\192.168.11.3\share\media\
+          source: \\192.168.11.201\srv\share\media\
           target: G:\My Drive\Backup\Share\media\
+          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
+      - sync-win:
+          folder: Dump
+          source-host: gondor
+          source: \\192.168.11.201\srv\share\media\.dump\
+          target: G:\Shared drives\Misc\Dump\
           options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
 
 - project:
     name: home
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
+    #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
       - sync:
+          target-host: 'tak@192.168.11.201'
+          target-dir: '/srv/share/Backup/Mac/'
           source-host: eowyn
           source-dirs: /Users/tak/
+          rsync: /usr/local/bin/rsync
           options: >
             -urltDmiS
+            -og --chown=nobody:nogroup
+            -p --chmod=g+r
             --exclude Downloads/
             --exclude Library/
+            --exclude VMs
+            --exclude 'VirtualBox VMs'
             --exclude .jenkins/cache/
             --exclude .cache/
+            --exclude .gradle/
             --exclude .bash_sessions/
             --exclude .dropbox/
-            --exclude .Trash/
-            --exclude .Trashes/
+            --exclude .eclipse/
+            --exclude .local/share/NuGet/
             --exclude Movies/Miro/
+            --exclude 'Movies/iMovie Library.imovielibrary/.fcpcache'
+            --exclude '*Backup.imovieevent'
             --exclude media/
-            --exclude workspace/
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
+            --exclude workspace/ \
 
 - project:
     name: downloads
     trigger: H H * * *
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
-    options: >
-      -urltDmiS
-      --exclude .Trash/
-      --exclude .Trashes/
-      --remove-source-files
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
+          #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
+          target-host: 'tak@192.168.11.201'
+          target-dir: '/srv/share/Backup/Downloads/'
           source-host: eowyn
           source-dirs: /Users/tak/Downloads/
+          options: >
+            -urltDmiS
+            --chmod=ugo=rwX
+            --remove-source-files \
       - 'organize-episodes-{host}-{name}':
           host: master
           cleanup: false
-          library-dir: /mnt/share/media
-          search-dir: /mnt/share/media/downloads
+          library-dir: /srv/share/media
+          search-dir: /srv/share/media/downloads
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
 
 - project:
     name: srv
     trigger: H H * * H
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
-    options: >
-      -urlptDmiS
-      --exclude .Trash/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
+          #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
+          target-host: ''
+          target-dir: '/srv/share/proj/srv/'
           rsync: sudo rsync
           source-host: master
           source-dirs: /srv/
+          options: >
+            -urlptDmiS
+            --exclude opengrok/
+            --exclude share/ \
 
 - project:
     name: jenkins
     trigger: H H * * H
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
-    options: >
-      -urlptDmiS
-      --exclude .Trash/
-      --exclude jobs/*/builds/
-      --exclude .cache/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
-          rsync: sudo rsync
+          #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
+          target-host: ''
+          target-dir: '/srv/share/proj/jenkins/'
           source-host: master
           source-dirs: /var/lib/jenkins/
+          options: >
+            -urlptDmiS
+            --exclude jobs/*/builds/
+            --exclude .cache/ \
 
 - project:
     name: www
     trigger: H H * * H
     recipients: tak.kanemoto@gmail.com
-    target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
-    options: >
-      -urlptDmiS
-      --exclude .Trash/
-      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
     jobs:
       - sync:
+          #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
+          target-host: ''
+          target-dir: '/srv/share/proj/srv/www/'
           rsync: sudo rsync
           source-host: master
           source-dirs: /var/www/
+          options: >
+            -urlptDmiS \
 
-- project:
-    name: proj
-    trigger: H H * * H
-    recipients: tak.kanemoto@gmail.com
-    jobs:
-      - sync-win:
-          folder: git
-          source-host: gondor
-          source: \\192.168.11.3\share\proj\
-          target: G:\My Drive\Backup\Share\proj\
-          options: /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
+# - project:
+#     name: proj
+#     trigger: H H * * H
+#     recipients: tak.kanemoto@gmail.com
+#     jobs:
+#       - sync-win:
+#           folder: ''
+#           source-host: gondor
+#           source: \\192.168.11.201\srv\share\proj\
+#           target: G:\My Drive\Backup\Share\proj\
+#           options: /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
 
 - project:
     name: share
     trigger: H H * * H
     recipients: tak.kanemoto@gmail.com
     jobs:
+      - sync:
+          target-host: 'root@192.168.11.3'
+          target-dir: '/mnt/DroboFS/Shares/share/'
+          source-host: master
+          source-dirs: /srv/share/
+          rsync: sudo rsync
+          options: >
+            -zurltDmiS
+            --exclude .jenkins/cache/
+            --exclude .cache/
+            --exclude .bash_sessions/
+            --exclude .dropbox/
+            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
+
       - sync-win:
-          folder: VMs
+          folder: ''
           source-host: gondor
-          source: \\192.168.11.3\share\
-          target: G:\My Drive\Backup\Share\
-          options: /XF *.part /XF desktop.ini
+          source: \\192.168.11.201\srv\share
+          target: G:\My Drive\Backup\Share
+          options: /XD Backup /XD .dump /XD .eclipse /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
       - sync-win:
           folder: Backup
           source-host: gondor
-          source: \\192.168.11.3\share\
+          source: \\192.168.11.201\srv\share\
           target: G:\My Drive\
-          options: /XD Downloads /XD .jenkins\cache /XD .cache /XD .bash_sessions /XD .dropbox /XD media /XD AppData
+          options: /XD .jenkins\cache /XD .cache /XD .eclipse /XD .bash_sessions /XD .dropbox /XD media /XD AppData
