@@ -56,6 +56,7 @@
               --exclude *.part \
               --exclude .Trash \
               --exclude .Trashes \
+              --exclude __pycache__ \
               {all-options} \
             | stdbuf -oL tr '\r' '\n'
           done
@@ -97,6 +98,7 @@
             /XF .DS_Store ^
             /XD .Trashes ^
             /XD .Trash ^
+            /XD __pycache__ ^
             /XD $RECYCLE.BIN ^
             /XD *-V100 ^
             /XD .TemporaryItems ^
@@ -111,6 +113,7 @@
           IF %ERRORLEVEL% EQU 1 EXIT 0
           IF %ERRORLEVEL% EQU 2 EXIT 0
           IF %ERRORLEVEL% EQU 3 EXIT 0
+          IF %ERRORLEVEL% EQU 16 EXIT 0
 
     publishers:
       - email:
