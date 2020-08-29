@@ -4,6 +4,7 @@
 - defaults:
     name: sync-defaults
     rsync: rsync
+    disabled: '{obj:disabled}'
     logrotate:
       numToKeep: 100
 

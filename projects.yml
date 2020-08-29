@@ -32,8 +32,9 @@
       - sync:
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
           #  --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
-          target-host: 'tak@192.168.11.201'
-          target-dir: '/mnt/share/media/'
+          #target-host: 'tak@192.168.11.201'
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/media/'
           source-host: eowyn
           source-dirs: /Volumes/PHAT/
           options: >
@@ -46,8 +47,8 @@
             --exclude TV \
 
       - sync:
-          target-host: ''
-          target-dir: '/mnt/share/media/'
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/media/'
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
           rsync: sudo rsync
@@ -55,39 +56,39 @@
             -urlDmiS
             --remove-source-files \
 
-      - sync-win:
-          folder: Movies
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share\media\
-          source: C:\Users\tkane\share\media\
-          target: G:\My Drive\Backup\Share\media\
-          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
-      - sync-win:
-          folder: Music
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share\media\
-          source: C:\Users\tkane\share\media\
-          target: G:\My Drive\Backup\Share\media\
-          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
-      - sync-win:
-          folder: Production
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share\media\
-          source: C:\Users\tkane\share\media\
-          target: G:\My Drive\
-          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.*
-      - sync-win:
-          folder: TV
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share\media\
-          source: C:\Users\tkane\share\media\
-          target: G:\My Drive\Backup\Share\media\
-          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
+      #- sync-win:
+      #    folder: Movies
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share\media\
+      #    source: C:\Users\tkane\share\media\
+      #    target: G:\My Drive\Backup\Share\media\
+      #    options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
+      #- sync-win:
+      #    folder: Music
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share\media\
+      #    source: C:\Users\tkane\share\media\
+      #    target: G:\My Drive\Backup\Share\media\
+      #    options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
+      #- sync-win:
+      #    folder: Production
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share\media\
+      #    source: C:\Users\tkane\share\media\
+      #    target: G:\My Drive\
+      #    options: /XF *.part /XF desktop.ini /XF .Desktop.ini.*
+      #- sync-win:
+      #    folder: TV
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share\media\
+      #    source: C:\Users\tkane\share\media\
+      #    target: G:\My Drive\Backup\Share\media\
+      #    options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
       - sync-win:
           folder: '.dump'
           source-host: gondor
-          #source: \\192.168.11.201\srv\share\media\
-          source: C:\Users\tkane\share\media\
+          source: \\moria\volume1\share\media\
+          #source: C:\Users\tkane\share\media\
           target: G:\Shared drives\Misc\
           options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
           trigger: ''
@@ -99,8 +100,9 @@
     #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
       - sync:
-          target-host: 'tak@192.168.11.201'
-          target-dir: '/mnt/share/Backup/Mac/'
+          target-host: 'admin@192.168.11.212'
+          #target-dir: '/mnt/share/Backup/Mac/'
+          target-dir: '/volume1/share/Backup/Mac/'
           source-host: eowyn
           source-dirs: /Users/tak/
           rsync: /usr/local/bin/rsync
@@ -132,8 +134,8 @@
     jobs:
       - sync:
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
-          target-host: 'tak@192.168.11.201'
-          target-dir: '/mnt/share/Backup/Downloads/'
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/Backup/Downloads/'
           source-host: eowyn
           source-dirs: /Users/tak/Downloads/
           options: >
@@ -154,8 +156,9 @@
     jobs:
       - sync:
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv'
-          target-host: ''
-          target-dir: '/mnt/share/proj/srv/'
+          #target-host: ''
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/proj/srv/'
           rsync: sudo rsync
           source-host: master
           source-dirs: /srv/
@@ -171,8 +174,9 @@
     jobs:
       - sync:
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/jenkins'
-          target-host: ''
-          target-dir: '/mnt/share/proj/jenkins/'
+          #target-host: ''
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/proj/jenkins/'
           source-host: master
           source-dirs: /var/lib/jenkins/
           options: >
@@ -187,8 +191,9 @@
     jobs:
       - sync:
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/proj/srv/www'
-          target-host: ''
-          target-dir: '/mnt/share/proj/srv/www/'
+          #target-host: ''
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/proj/srv/www/'
           rsync: sudo rsync
           source-host: master
           source-dirs: /var/www/
@@ -207,36 +212,37 @@
 #           target: G:\My Drive\Backup\Share\proj\
 #           options: /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
 
-- project:
-    name: share
-    trigger: H H * * H
-    recipients: tak.kanemoto@gmail.com
-    jobs:
-      - sync:
-          target-host: 'root@192.168.11.3'
-          target-dir: '/mnt/DroboFS/Shares/share/'
-          source-host: master
-          source-dirs: /srv/share/
-          rsync: sudo rsync
-          options: >
-            -zurltDmiS
-            --exclude .jenkins/cache/
-            --exclude .cache/
-            --exclude .bash_sessions/
-            --exclude .dropbox/
-            --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
+#- project:
+#    name: share
+#    trigger: H H * * H
+#    recipients: tak.kanemoto@gmail.com
+#    disabled: true
+#    jobs:
+      #- sync:
+      #    target-host: 'admin@192.168.11.212'
+      #    target-dir: '/volume1/share/'
+      #    source-host: master
+      #    source-dirs: /srv/share/
+      #    rsync: sudo rsync
+      #    options: >
+      #      -zurltDmiS
+      #      --exclude .jenkins/cache/
+      #      --exclude .cache/
+      #      --exclude .bash_sessions/
+      #      --exclude .dropbox/
+      #      --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync \
 
-      - sync-win:
-          folder: ''
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share
-          source: C:\Users\tkane\share
-          target: G:\My Drive\Backup\Share
-          options: /XD Backup /XD .dump /XD .eclipse /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
-      - sync-win:
-          folder: Backup
-          source-host: gondor
-          #source: \\192.168.11.201\srv\share\
-          source: C:\Users\tkane\share\
-          target: G:\My Drive\
-          options: /XD .jenkins\cache /XD .cache /XD .eclipse /XD .bash_sessions /XD .dropbox /XD media /XD AppData
+      #- sync-win:
+      #    folder: ''
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share
+      #    source: C:\Users\tkane\share
+      #    target: G:\My Drive\Backup\Share
+      #    options: /XD Backup /XD .dump /XD .eclipse /XF *.part /XF .Desktop.ini.* /XF tmp_* /XF *.tmp /XF incoming_*
+      #- sync-win:
+      #    folder: Backup
+      #    source-host: gondor
+      #    #source: \\192.168.11.201\srv\share\
+      #    source: C:\Users\tkane\share\
+      #    target: G:\My Drive\
+      #    options: /XD .jenkins\cache /XD .cache /XD .eclipse /XD .bash_sessions /XD .dropbox /XD media /XD AppData
