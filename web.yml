@@ -50,6 +50,10 @@
     wrappers:
       - inject-passwords:
           global: true
+          mask-password-params: true
+          job-passwords:
+              - name: auth_key
+                password: '{{AQAAABAAAAAw7UikubVwVQu0pCi7GUkeaxnnsh+18VLH4mKnZzshPbqKWOPhEeEGNeflqTJoly0r3Q2LhY5/GOnpBf1dLL7v1g==}}'
 
     builders:
       - shell: |

@@ -84,14 +84,15 @@
       #    source: C:\Users\tkane\share\media\
       #    target: G:\My Drive\Backup\Share\media\
       #    options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
-      - sync-win:
-          folder: '.dump'
-          source-host: gondor
-          source: \\moria\volume1\share\media\
-          #source: C:\Users\tkane\share\media\
-          target: G:\Shared drives\Misc\
-          options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
-          trigger: ''
+
+      # - sync-win:
+      #     folder: '.dump'
+      #     source-host: gondor
+      #     source: \\moria\volume1\share\media\
+      #     #source: C:\Users\tkane\share\media\
+      #     target: G:\Shared drives\Misc\
+      #     options: /XF *.part /XF desktop.ini /XF .Desktop.ini.* /MOVE
+      #     trigger: ''
 
 - project:
     name: home
