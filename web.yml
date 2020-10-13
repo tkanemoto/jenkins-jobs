@@ -139,7 +139,7 @@
           sudo rm -f project/temp.py
 
           ./manage.py collectstatic --noinput --settings project.settings_local
-          ./manage.py dumpdata --indent 2 --settings project.settings_local > $WORKSPACE/dump.json
+          ./manage.py dumpdata --settings project.settings_local > $WORKSPACE/dump.json
 
       - shell: |
           if [ "$dump_db" = "true" ] ; then
