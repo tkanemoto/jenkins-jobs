@@ -109,6 +109,8 @@
           #!/bin/bash -ex
           cd /var/www/django-site/site
           source ../.virtualenv/bin/activate
+          ./manage.py dumpdata --settings project.settings_local > $WORKSPACE/dump.json
+          exit 0
           echo '
           from portfolios.models import *
           for p in Page.objects.all(): print(p.slug + " " + p.domain)
@@ -147,15 +149,17 @@
           elif [ `date +%H` -lt 1 ] || [ `date +%H` -gt 9 ] ; then
             exit
           fi
-          echo 1 | sudo dd of=/sys/kernel/mm/ksm/run
-          (cd db-dumps && git reset --hard && git pull -r) || {{
-            mkdir -p db-dumps
-            git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps checkout master
-          }}
-          cd db-dumps
+          #echo 1 | sudo dd of=/sys/kernel/mm/ksm/run
+          #(cd db-dumps && git reset --hard && git pull -r) || {{
+          #  mkdir -p db-dumps
+          #  git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps checkout master
+          #}}
+          #cd db-dumps
           sudo -u postgres pg_dumpall > dump.sql
-          git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps add dump.sql
-          git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps commit -m "Dump at `date +'%F-%H%M'`" || true
+          rm -f dump.sql.gz
+          gzip dump.sql
+          #git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps add dump.sql
+          #git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps commit -m "Dump at `date +'%F-%H%M'`" || true
           #git push origin master
 
     publishers:
