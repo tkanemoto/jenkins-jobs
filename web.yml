@@ -19,7 +19,7 @@
 
 - job-template:
     name: 'web-dns-update-cloudflare-{name}'
-    display-name: 'Web : DNS update (CloudFlare)'
+    display-name: 'Web : DNS update - {name} (CloudFlare)'
     node: '{name}'
     defaults: web-defaults
 

@@ -30,13 +30,13 @@
     recipients: tak.kanemoto@gmail.com
     jobs:
       - sync:
+          source-host: eowyn
+          source-dirs: /Volumes/PHAT/
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/media/'
           #  --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
           #target-host: 'tak@192.168.11.201'
           target-host: 'admin@192.168.11.212'
           target-dir: '/volume1/share/media/'
-          source-host: eowyn
-          source-dirs: /Volumes/PHAT/
           options: >
             -urlDmiS
             --exclude Downloads/
@@ -47,10 +47,10 @@
             --exclude TV \
 
       - sync:
-          target-host: 'admin@192.168.11.212'
-          target-dir: '/volume1/share/media/'
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/media/'
           rsync: sudo rsync
           options: >
             -urlDmiS
@@ -101,11 +101,11 @@
     #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/'
     jobs:
       - sync:
+          source-host: eowyn
+          source-dirs: /Users/tak/
           target-host: 'admin@192.168.11.212'
           #target-dir: '/mnt/share/Backup/Mac/'
           target-dir: '/volume1/share/Backup/Mac/'
-          source-host: eowyn
-          source-dirs: /Users/tak/
           rsync: /usr/local/bin/rsync
           # -og --chown=nobody:nogroup
           #  -p --chmod=g+r
@@ -127,6 +127,24 @@
             --exclude '*Backup.imovieevent'
             --exclude media/
             --exclude workspace/ \
+      - sync:
+          source-host: melchior
+          source-dirs: /Users/tak/
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/Backup/Mac/'
+          rsync: /usr/local/bin/rsync
+          options: >
+            -urlDmiS
+            --exclude Downloads/
+            --exclude Library/
+            --exclude VMs
+            --exclude .jenkins/cache/
+            --exclude .cache/
+            --exclude .gradle/
+            --exclude 'Movies/iMovie Library.imovielibrary/.fcpcache'
+            --exclude '*Backup.imovieevent'
+            --exclude media/
+            --exclude workspace/ \
 
 - project:
     name: downloads
@@ -134,15 +152,23 @@
     recipients: tak.kanemoto@gmail.com
     jobs:
       - sync:
+          source-host: eowyn
+          source-dirs: /Users/tak/Downloads/
           #target: 'root@192.168.11.3:/mnt/DroboFS/Shares/share/Downloads'
           target-host: 'admin@192.168.11.212'
           target-dir: '/volume1/share/Backup/Downloads/'
-          source-host: eowyn
-          source-dirs: /Users/tak/Downloads/
           options: >
             -urlDmiS
             --chmod=ugo=rwX
             --remove-source-files \
+      - sync:
+          source-host: melchior
+          source-dirs: /Users/tak/Downloads/
+          target-host: 'admin@192.168.11.212'
+          target-dir: '/volume1/share/Backup/Downloads/'
+          options: >
+            -urlDmiS
+            --chmod=ugo=rwX \
       - 'organize-episodes-{host}-{name}':
           host: master
           cleanup: false
