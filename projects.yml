@@ -132,7 +132,7 @@
           source-dirs: /Users/tak/
           target-host: 'admin@192.168.11.212'
           target-dir: '/volume1/share/Backup/Mac/'
-          rsync: /usr/local/bin/rsync
+          rsync: /usr/bin/rsync
           options: >
             -urlDmiS
             --exclude Downloads/
