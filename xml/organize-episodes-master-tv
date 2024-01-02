@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <actions/>
+  <description>&lt;!-- Managed by Jenkins Job Builder --&gt;</description>
+  <keepDependencies>false</keepDependencies>
+  <disabled>false</disabled>
+  <displayName>Organize Episodes : master tv</displayName>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>100</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>H * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash -ex
+(
+  cd python-mlib
+  git fetch
+  git reset --hard origin/master
+) || {
+  rm -rf python-mlib
+  git clone https://github.com/tkanemoto/python-mlib
+}
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash -ex
+virtualenv .env
+source .env/bin/activate
+pip install -r python-mlib/requirements.txt
+cd /mnt/usbshare/media
+$WORKSPACE/python-mlib/mlib.py organise_movies -v3 --traceback \
+  --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1 /mnt/share/media/Transmission
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.Mailer plugin="mailer">
+      <recipients>tak.kanemoto@gmail.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+    <hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+      <regexp>Transferred .* failed .* out of .*</regexp>
+      <regexpForFailed>Transferred .* failed .* out of .*</regexpForFailed>
+      <setForMatrix>false</setForMatrix>
+    </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

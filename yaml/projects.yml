@@ -18,7 +18,7 @@
     jobs:
       - 'organize-episodes-{host}-{name}':
           host: master
-          library-dir: /mnt/share/media
+          library-dir: /mnt/usbshare/media
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
       - 'cleanup-{host}-{name}':
           host: master
@@ -36,7 +36,7 @@
           #  --rsync-path=/mnt/DroboFS/Shares/DroboApps/rsync/rsync
           #target-host: 'tak@192.168.11.201'
           target-host: 'admin@192.168.11.212'
-          target-dir: '/volume1/share/media/'
+          target-dir: '/volumeUSB1/usbshare/media/'
           options: >
             -urlDmiS
             --exclude Downloads/
@@ -50,7 +50,7 @@
           source-host: master
           source-dirs: /var/lib/transmission-daemon/downloads/
           target-host: 'admin@192.168.11.212'
-          target-dir: '/volume1/share/media/'
+          target-dir: '/volumeUSB1/usbshare/media/'
           rsync: sudo rsync
           options: >
             -urlDmiS
@@ -172,8 +172,8 @@
       - 'organize-episodes-{host}-{name}':
           host: master
           cleanup: false
-          library-dir: /mnt/share/media
-          search-dir: /mnt/share/media/downloads
+          library-dir: /mnt/usbshare/media
+          search-dir: /mnt/usbshare/media/downloads
           args: --move --api-key 5024c33353fb1b47e78e55e3ab70ac7b --memcache-server 127.0.0.1
 
 - project:

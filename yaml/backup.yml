@@ -4,7 +4,7 @@
 - defaults:
     name: sync-defaults
     rsync: rsync
-    disabled: '{obj:disabled}'
+    disabled: false
     logrotate:
       numToKeep: 100
 
@@ -23,7 +23,6 @@
     display-name: 'Sync {name} : {source-host}   ⟶   {target-host} {target-dir}'
     node: '{source-host}'
     defaults: sync-defaults
-    disabled: '{obj:disabled}'
 
     triggers:
       - timed: '{trigger}'

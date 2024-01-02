@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <actions/>
+  <description>&lt;!-- Managed by Jenkins Job Builder --&gt;</description>
+  <keepDependencies>false</keepDependencies>
+  <displayName>Web : Maintenance - master</displayName>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <concurrentBuild>false</concurrentBuild>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>100</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.BooleanParameterDefinition>
+          <name>dump_db</name>
+          <description/>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>H 3 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash -ex
+cd /var/www/django-site/site
+source ../.virtualenv/bin/activate
+./manage.py dumpdata --settings project.settings_local &gt; $WORKSPACE/dump.json
+exit 0
+echo '
+from portfolios.models import *
+for p in Page.objects.all(): print(p.slug + &quot; &quot; + p.domain)
+
+' | ./manage.py shell --settings project.settings_local | while read line ; do
+  sudo rm -f static/index.html
+  slug=`echo $line | cut -d ' ' -f1`
+  domain=`echo $line | cut -d ' ' -f2`
+  curl https://tkanemoto.com/portfolios/$slug/ &gt; $WORKSPACE/$slug.html.new
+  if [ -e $WORKSPACE/$slug.html ] &amp;&amp; diff $WORKSPACE/$slug.html.new $WORKSPACE/$slug.html ; then
+    rm $WORKSPACE/$slug.html.new
+  else
+    mv $WORKSPACE/$slug.html.new $WORKSPACE/$slug.html
+    sudo cp $WORKSPACE/$slug.html static/index.html
+  fi
+
+  echo &quot;
+from .settings_local import *
+AWS_STORAGE_BUCKET_NAME = '$domain'
+AWS_AUTO_CREATE_BUCKET = True
+AWS_S3_OBJECT_PARAMETERS['CacheControl'] = 'max-age=86400'
+AWS_QUERYSTRING_EXPIRE = 86400
+&quot; | sudo dd of=project/temp.py
+
+  ./manage.py collectstatic --noinput --settings project.temp
+done
+sudo rm -f static/index.html
+sudo rm -f project/temp.py
+
+./manage.py collectstatic --noinput --settings project.settings_local
+./manage.py dumpdata --settings project.settings_local &gt; $WORKSPACE/dump.json
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>if [ &quot;$dump_db&quot; = &quot;true&quot; ] ; then
+  echo &quot;Forcing DB dump&quot;
+elif [ `date +%H` -lt 1 ] || [ `date +%H` -gt 9 ] ; then
+  exit
+fi
+#echo 1 | sudo dd of=/sys/kernel/mm/ksm/run
+#(cd db-dumps &amp;&amp; git reset --hard &amp;&amp; git pull -r) || {
+#  mkdir -p db-dumps
+#  git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps checkout master
+#}
+#cd db-dumps
+sudo -u postgres pg_dumpall &gt; dump.sql
+rm -f dump.sql.gz
+gzip dump.sql
+#git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps add dump.sql
+#git --git-dir=/var/gerrit/git/web/db-dumps.git --work-tree=$WORKSPACE/db-dumps commit -m &quot;Dump at `date +'%F-%H%M'`&quot; || true
+#git push origin master
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.Mailer plugin="mailer">
+      <recipients>tak.kanemoto@gmail.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*</artifacts>
+      <allowEmptyArchive>true</allowEmptyArchive>
+      <onlyIfSuccessful>false</onlyIfSuccessful>
+      <fingerprint>true</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <latestOnly>false</latestOnly>
+      <followSymlinks>false</followSymlinks>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>
